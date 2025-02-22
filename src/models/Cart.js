@@ -1,14 +1,45 @@
-const express = require('express');
-const router = express.Router();
-const cartController = require('../controllers/cartController');
-const { protect } = require('../middlewares/auth');
+const mongoose = require('mongoose');
 
-// Tüm cart rotaları için authentication gerekli
-router.use(protect);
+const cartItemSchema = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+    required: true
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: [1, 'Miktar en az 1 olmalıdır']
+  },
+  price: {
+    type: Number,
+    required: true
+  }
+});
 
-router.get('/', cartController.getCart);
-router.post('/add', cartController.addToCart);
-router.delete('/remove/:productId', cartController.removeFromCart);
-router.patch('/update/:productId', cartController.updateCartItem);
+const cartSchema = new mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+    unique: true
+  },
+  items: [cartItemSchema],
+  totalAmount: {
+    type: Number,
+    default: 0
+  }
+}, {
+  timestamps: true
+});
 
-module.exports = router;
+// Toplam tutarı otomatik hesaplama
+cartSchema.pre('save', function(next) {
+  this.totalAmount = this.items.reduce((total, item) => {
+    return total + (item.price * item.quantity);
+  }, 0);
+  next();
+});
+
+const Cart = mongoose.model('Cart', cartSchema);
+module.exports = Cart;

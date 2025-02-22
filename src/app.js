@@ -19,13 +19,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+// Routes
 const authRoutes = require('./routes/authRoutes');
 const productRoutes = require('./routes/productRoutes');
-app.use('/api/cart', require('./routes/cartRoutes'));
-
+const cartRoutes = require('./routes/cartRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', require('./routes/orderRoutes'));
 
 // Test route
 app.get('/', (req, res) => {
