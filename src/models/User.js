@@ -35,7 +35,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Last name is required'],
     trim: true,
-    minlength: [2, 'Soyisim çok kısa'],
+    minlength: [1, 'Soyisim çok kısa'],
     maxlength: [50, 'Soyisim çok uzun']
   },
   role: {
